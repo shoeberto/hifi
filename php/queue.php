@@ -1,19 +1,29 @@
 <?php
 
 $start = $_POST['start'];
-$end = $_POST['end'];
 
-$fh = fopen('queue.csv', 'r');
+$timeout = 600;
 
-$queue = [];
-$header = fgetcsv($fh);
-while ($row = fgetcsv($fh)) {
-    $row = array_combine($header, $row);
-    if ($start <= $row['timestamp'] && $end >= $row['timestamp']) {
-        $queue[] = $row['file'];
+for ($i = 0; $i < $timeout; $i++) {
+    $fh = fopen('queue.csv', 'r');
+
+    $queue = [];
+    $header = fgetcsv($fh);
+    while ($row = fgetcsv($fh)) {
+        $row = array_combine($header, $row);
+        if ($start <= $row['timestamp']) {
+            $queue[] = $row['file'];
+        }
     }
+
+    fclose($fh);
+
+    if (!empty($queue)) {
+        print(json_encode($queue));
+        exit(0);
+    }
+
+    usleep(50000);
 }
 
-fclose($fh);
-
-print(json_encode($queue));
+print(json_encode([]));

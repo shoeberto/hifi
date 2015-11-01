@@ -8,19 +8,17 @@ $(document).ready(function(){
 var lastTic = Date.now();
 var loadedSounds = [];
 
-window.setInterval(checkQueue, 500);
+checkQueue();
 
 function checkQueue() {
     var httpRequest = new XMLHttpRequest();
     httpRequest.addEventListener("load", queueResponse);
     httpRequest.open('POST', 'php/queue.php', true);
     var tic = Date.now();
-    var range = "start=" + lastTic + "&end=" + tic;
+    var range = "start=" + lastTic;
 
     httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    httpRequest.setRequestHeader('Content-Length', range.length);
     httpRequest.send(range);
-    lastTic = tic;
 }
 
 function queueResponse() {
@@ -39,4 +37,7 @@ function queueResponse() {
             alert('There was a problem with the request.');
         }
     }
+
+    lastTic = Date.now();
+    checkQueue();
 }
