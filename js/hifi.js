@@ -1,5 +1,12 @@
+$(document).ready(function(){
+    lowLag.init({
+        'urlPrefix': 'sfx/',
+        'audioTagTimeToLive': 30000
+    });
+});
+
 var lastTic = Date.now();
-var buzzes = {};
+var loadedSounds = [];
 
 window.setInterval(checkQueue, 500);
 
@@ -22,10 +29,11 @@ function queueResponse() {
             var files = JSON.parse(this.responseText);
             for (var i = 0; i < files.length; i++) {
                 file = files[i];
-                if (!(file in buzzes)) {
-                    buzzes[file] = new buzz.sound("sfx/" + file + ".ogg", {preload: true});
+                if (-1 == loadedSounds.indexOf(file)) {
+                    lowLag.load([file + ".ogg"], file);
+                    loadedSounds.push(file);
                 }
-                buzzes[file].play();
+                lowLag.play(file);
             }
         } else {
             alert('There was a problem with the request.');
