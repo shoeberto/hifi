@@ -19,11 +19,11 @@ for ($i = 0; $i < $timeout; $i++) {
     fclose($fh);
 
     if (!empty($queue)) {
-        print(json_encode($queue));
+        print(json_encode(['timestamp' => microtime(true) * 1000, 'queue' => $queue]));
         exit(0);
     }
 
     usleep(50000);
 }
 
-print(json_encode([]));
+print(json_encode(['timestamp' => microtime(true) * 1000, 'queue' => []]));

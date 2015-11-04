@@ -24,7 +24,8 @@ function checkQueue() {
 function queueResponse() {
     if (this.readyState === XMLHttpRequest.DONE) {
         if (this.status === 200) {
-            var files = JSON.parse(this.responseText);
+            var response = JSON.parse(this.responseText);
+            files = response.queue
             for (var i = 0; i < files.length; i++) {
                 file = files[i];
                 if (-1 == loadedSounds.indexOf(file)) {
@@ -33,11 +34,13 @@ function queueResponse() {
                 }
                 lowLag.play(file);
             }
+            lastTic = response.timestamp;
         } else {
             alert('There was a problem with the request.');
         }
+    } else {
+        lastTic = Date.now();
     }
 
-    lastTic = Date.now();
     checkQueue();
 }
