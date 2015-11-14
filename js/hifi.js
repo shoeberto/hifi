@@ -1,12 +1,21 @@
-$(document).ready(function(){
-    lowLag.init({
-        'urlPrefix': 'sfx/',
-        'audioTagTimeToLive': 30000
-    });
-});
+createjs.Sound.registerPlugins([createjs.WebAudioPlugin, createjs.HTMLAudioPlugin]);
+createjs.Sound.on('fileload', createjs.proxy(loadHandler));
+createjs.Sound.volume = 0.25;
+
+function loadHandler(event) {
+    // This is fired for each sound that is registered.
+    var instance = createjs.Sound.play(event.id);
+}
 
 var lastTic = Date.now();
 var loadedSounds = [];
+
+document.addEventListener("DOMContentLoaded", function(event) {
+    console.log("DOM fully loaded and parsed");
+    document.getElementById('volume').addEventListener('input', function(e) {
+        createjs.Sound.volume = Number(e.target.value) / 100.0;
+    });
+});
 
 checkQueue();
 
@@ -29,10 +38,11 @@ function queueResponse() {
             for (var i = 0; i < files.length; i++) {
                 file = files[i];
                 if (-1 == loadedSounds.indexOf(file)) {
-                    lowLag.load([file + ".ogg"], file);
+                    createjs.Sound.registerSound(file + '.ogg', file, 16, 'sfx/');
                     loadedSounds.push(file);
+                } else {
+                    createjs.Sound.play(file);
                 }
-                lowLag.play(file);
             }
             lastTic = response.timestamp;
         } else {
