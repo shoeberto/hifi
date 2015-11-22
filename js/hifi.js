@@ -7,6 +7,7 @@ function loadHandler(event) {
     var instance = createjs.Sound.play(event.id);
 }
 
+var stop = false;
 var lastTic = Date.now();
 var loadedSounds = [];
 
@@ -15,11 +16,28 @@ document.addEventListener("DOMContentLoaded", function(event) {
     document.getElementById('volume').addEventListener('input', function(e) {
         createjs.Sound.volume = Number(e.target.value) / 100.0;
     });
+
+    document.getElementById('control').addEventListener('click', function(e) {
+        if (false == stop) {
+            createjs.Sound.stop();
+            stop = true;
+            this.text = 'PLAY';
+        } else {
+            stop = false;
+            lastTic = Date.now();
+            checkQueue();
+            this.text = 'STOP';
+        }
+    });
 });
 
 checkQueue();
 
 function checkQueue() {
+    if (true == stop) {
+        return;
+    }
+
     var httpRequest = new XMLHttpRequest();
     httpRequest.addEventListener("load", queueResponse);
     httpRequest.open('POST', 'php/queue.php', true);
@@ -31,6 +49,10 @@ function checkQueue() {
 }
 
 function queueResponse() {
+    if (true == stop) {
+        return;
+    }
+
     if (this.readyState === XMLHttpRequest.DONE) {
         if (this.status === 200) {
             var response = JSON.parse(this.responseText);
